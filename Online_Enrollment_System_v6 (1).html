@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>EnrollEase – Online Enrollment System</title>
+<style>
+
+    :root {
+      --navy: #142b55;
+      --blue: #2864dc;
+      --blue-dark: #194bb4;
+      --sky: #eaf2ff;
+      --ink: #1d2b45;
+      --muted: #71809a;
+      --line: #e4eaf3;
+      --surface: #ffffff;
+      --bg: #f5f7fc;
+      --green: #16845b;
+      --orange: #a65c09;
+      --shadow: 0 14px 36px rgba(29, 57, 105, .08);
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0; background: var(--bg); color: var(--ink);
+      font-family: Inter, "Segoe UI", Arial, sans-serif; line-height: 1.5;
+    }
+    button, input, select, textarea { font: inherit; }
+    button { cursor: pointer; }
+    .app { display: flex; min-height: 100vh; }
+    .sidebar {
+      width: 250px; background: var(--navy); color: white; padding: 26px 17px;
+      display: flex; flex-direction: column; flex-shrink: 0;
+    }
+    .brand { display: flex; gap: 12px; align-items: center; padding: 0 9px 30px; }
+    .brand-mark {
+      width: 42px; height: 42px; border-radius: 13px; display: grid; place-items: center;
+      background: #fff; color: var(--blue); font-size: 22px; font-weight: 900;
+    }
+    .brand strong { display: block; font-size: 15px; letter-spacing: .1px; }
+    .brand small { color: #b8c9e8; font-size: 11px; }
+    .nav-label { color: #8fa7d0; text-transform: uppercase; letter-spacing: 1.5px; font-size: 10px; font-weight: 800; padding: 9px 13px; }
+    .nav { display: grid; gap: 7px; }
+    .nav button {
+      color: #c9d6ee; background: transparent; border: 0; border-radius: 11px;
+      padding: 12px 13px; text-align: left; display: flex; gap: 12px; align-items: center;
+      transition: .2s;
+    }
+    .nav button span { width: 20px; text-align: center; font-size: 17px; }
+    .nav button:hover, .nav button.active { background: #244274; color: white; }
+    .nav button.active { box-shadow: inset 3px 0 #77a7ff; }
+    .side-bottom { margin-top: auto; padding: 20px 9px 0; }
+    .help-card { border: 1px solid #35517e; border-radius: 14px; padding: 15px; background: #1a3563; }
+    .help-card strong { font-size: 13px; }
+    .help-card p { font-size: 11px; color: #c0d0ea; margin: 6px 0 12px; }
+    .help-card a { color: #fff; font-size: 12px; font-weight: 700; }
+    main { min-width: 0; flex: 1; }
+    .topbar {
+      height: 78px; display: flex; align-items: center; justify-content: space-between;
+      padding: 0 36px; background: rgba(255,255,255,.9); border-bottom: 1px solid var(--line);
+      gap: 20px;
+    }
+    .crumb { color: var(--muted); font-size: 13px; }
+    .crumb strong { color: var(--ink); }
+    .top-actions { display: flex; align-items: center; gap: 17px; }
+    .icon-button { border: 1px solid var(--line); background: white; border-radius: 11px; width: 40px; height: 40px; color: var(--navy); font-size: 17px; position: relative; }
+    .dot { width: 7px; height: 7px; border-radius: 50%; background: #ef5c67; position: absolute; right: 8px; top: 7px; border: 1px solid white; }
+    .profile { display: flex; gap: 10px; align-items: center; }
+    .avatar { width: 39px; height: 39px; border-radius: 50%; background: #dce8ff; color: var(--blue-dark); display: grid; place-items: center; font-weight: 800; }
+    .profile strong { display: block; font-size: 12px; }
+    .profile small { display: block; color: var(--muted); font-size: 11px; }
+    .content { max-width: 1440px; margin: auto; padding: 30px 36px 45px; }
+    .welcome { display: flex; justify-content: space-between; align-items: flex-end; gap: 20px; margin-bottom: 24px; }
+    .eyebrow { color: var(--blue); text-transform: uppercase; font-size: 10px; font-weight: 900; letter-spacing: 1.8px; }
+    h1 { margin: 5px 0 5px; font-size: clamp(25px, 3vw, 33px); letter-spacing: -.8px; color: var(--navy); }
+    .welcome p { margin: 0; color: var(--muted); font-size: 14px; }
+    .btn { border: 0; border-radius: 10px; padding: 11px 16px; font-weight: 750; font-size: 13px; transition: .2s; }
+    .btn-primary { color: white; background: var(--blue); box-shadow: 0 7px 15px rgba(40,100,220,.18); }
+    .btn-primary:hover { background: var(--blue-dark); transform: translateY(-1px); }
+    .btn-light { color: var(--navy); background: white; border: 1px solid var(--line); }
+    .hero {
+      background: linear-gradient(115deg, #1d4fb3, #3479ed); color: white; border-radius: 20px;
+      padding: 26px 30px; display: flex; align-items: center; justify-content: space-between;
+      gap: 24px; overflow: hidden; position: relative; box-shadow: var(--shadow); margin-bottom: 22px;
+    }
+    .hero:after { content: ""; position: absolute; width: 240px; height: 240px; border: 40px solid rgba(255,255,255,.07); border-radius: 50%; right: 20%; top: -145px; }
+    .hero-copy { position: relative; z-index: 1; max-width: 600px; }
+    .hero .tag { display: inline-block; padding: 5px 9px; border-radius: 6px; background: rgba(255,255,255,.17); font-size: 10px; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; }
+    .hero h2 { font-size: 23px; margin: 11px 0 7px; }
+    .hero p { margin: 0; color: #dbe8ff; font-size: 13px; max-width: 530px; }
+    .hero .btn { position: relative; z-index: 1; background: white; color: var(--blue-dark); white-space: nowrap; }
+    .stats { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 17px; margin-bottom: 23px; }
+    .stat, .panel { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; box-shadow: 0 5px 20px rgba(29,57,105,.025); }
+    .stat { padding: 19px 20px; display: flex; align-items: center; gap: 15px; }
+    .stat-icon { width: 45px; height: 45px; border-radius: 13px; display: grid; place-items: center; font-size: 20px; background: var(--sky); }
+    .stat:nth-child(2) .stat-icon { background: #fff3df; }
+    .stat:nth-child(3) .stat-icon { background: #e1f7ed; }
+    .stat small { color: var(--muted); font-size: 11px; font-weight: 700; display: block; }
+    .stat strong { font-size: 21px; display: block; margin-top: 2px; color: var(--navy); }
+    .stat .sub { font-size: 10px; color: var(--muted); }
+    .layout { display: grid; grid-template-columns: minmax(0,1.55fr) minmax(280px,.85fr); gap: 22px; align-items: start; }
+    .panel { padding: 23px; margin-bottom: 22px; }
+    .panel-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 14px; margin-bottom: 20px; }
+    .panel h3 { margin: 0; color: var(--navy); font-size: 16px; }
+    .panel-head p { color: var(--muted); margin: 4px 0 0; font-size: 12px; }
+    .step-pill { background: var(--sky); color: var(--blue-dark); font-size: 10px; font-weight: 800; padding: 6px 9px; border-radius: 7px; white-space: nowrap; }
+    .progress { display: flex; gap: 7px; margin-bottom: 24px; }
+    .progress span { height: 5px; flex: 1; border-radius: 5px; background: #e6ebf4; }
+    .progress span.done { background: var(--blue); }
+    .form-section { border-top: 1px solid var(--line); padding-top: 20px; margin-top: 20px; }
+    .form-section h4 { font-size: 13px; margin: 0 0 15px; color: var(--navy); display: flex; gap: 8px; align-items: center; }
+    .number { width: 23px; height: 23px; display: grid; place-items: center; border-radius: 7px; background: var(--sky); color: var(--blue); font-size: 11px; }
+    .fields { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 15px; }
+    .field { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+    .field.full { grid-column: 1 / -1; }
+    label { font-size: 11px; font-weight: 800; color: #4e5d77; }
+    input, select, textarea { width: 100%; border: 1px solid #dce4f0; background: #fbfcff; color: var(--ink); border-radius: 9px; padding: 11px 12px; outline: none; font-size: 12px; }
+    input:focus, select:focus, textarea:focus { border-color: #77a2f2; box-shadow: 0 0 0 3px #e9f1ff; }
+    input[type=file] { padding: 9px; background: white; }
+    .hint { color: var(--muted); font-size: 10px; }
+    .upload-box { border: 1px dashed #b9c9e4; border-radius: 11px; padding: 15px; background: #f9fbff; }
+    .upload-box p { margin: 4px 0 10px; font-size: 10px; color: var(--muted); }
+    .checkline { display: flex; gap: 9px; align-items: flex-start; color: #5d6b82; font-size: 11px; margin: 18px 0; }
+    .checkline input { width: auto; margin-top: 3px; }
+    .form-actions { display: flex; gap: 10px; justify-content: flex-end; flex-wrap: wrap; margin-top: 20px; }
+    .status { font-size: 10px; padding: 5px 9px; border-radius: 20px; font-weight: 800; display: inline-block; }
+    .status.pending { color: var(--orange); background: #fff3df; }
+    .status.unpaid { color: #b13b4a; background: #ffebee; }
+    .status.confirmed { color: var(--green); background: #e2f7ee; }
+    .record-row { display: flex; gap: 12px; align-items: center; padding: 13px 0; border-bottom: 1px solid var(--line); }
+    .record-row:last-child { border-bottom: 0; padding-bottom: 0; }
+    .file-icon { width: 38px; height: 40px; display: grid; place-items: center; border-radius: 9px; background: #fff0f0; color: #d14e58; font-weight: 900; font-size: 10px; }
+    .record-row strong { display: block; font-size: 12px; }
+    .record-row small { color: var(--muted); font-size: 10px; display: block; }
+    .record-row .push { margin-left: auto; }
+    .link-btn { color: var(--blue); border: 0; background: none; font-size: 11px; font-weight: 800; padding: 5px; }
+    .fee-line { display: flex; justify-content: space-between; gap: 12px; font-size: 12px; padding: 9px 0; color: #56647b; }
+    .fee-line strong { color: var(--ink); }
+    .fee-total { border-top: 1px solid var(--line); margin-top: 7px; padding-top: 15px; font-size: 13px; }
+    .fee-total strong { font-size: 17px; color: var(--navy); }
+    .payment-method { border: 1px solid #d9e5f8; border-radius: 12px; padding: 15px; background: #f8fbff; margin-top: 13px; }
+    .payment-method h4 { margin: 0 0 5px; font-size: 12px; }
+    .payment-method p { margin: 0; color: var(--muted); font-size: 10px; }
+    .qr-placeholder { width: 115px; height: 115px; margin: 14px auto; background: white; border: 1px dashed #9db4dc; border-radius: 8px; display: grid; place-items: center; text-align: center; color: #6680ad; font-size: 10px; padding: 12px; }
+    .qr-placeholder span { font-size: 28px; display: block; }
+    .timeline { margin-top: 3px; }
+    .timeline-item { display: flex; gap: 12px; padding-bottom: 19px; position: relative; }
+    .timeline-item:not(:last-child):before { content: ""; position: absolute; left: 10px; top: 23px; height: calc(100% - 20px); width: 1px; background: #dce5f2; }
+    .timeline-dot { width: 21px; height: 21px; border-radius: 50%; background: #e8effb; border: 5px solid #d3e1fa; flex-shrink: 0; }
+    .timeline-item.current .timeline-dot { background: var(--blue); border-color: #dce8ff; }
+    .timeline-item strong { display: block; font-size: 11px; }
+    .timeline-item small { display: block; color: var(--muted); font-size: 10px; margin-top: 3px; }
+    .notice { display: flex; gap: 10px; padding: 13px; background: #fff8e9; border: 1px solid #f6e5bc; border-radius: 11px; color: #8d641d; font-size: 11px; }
+    .notice b { display: block; margin-bottom: 2px; }
+    .footer { text-align: center; color: #94a0b4; font-size: 10px; padding: 8px 0 20px; }
+    .toast { position: fixed; right: 22px; bottom: 22px; z-index: 10; background: #17345f; color: white; border-radius: 12px; padding: 14px 18px; box-shadow: var(--shadow); font-size: 12px; display: none; max-width: 330px; }
+    .toast.show { display: block; animation: pop .25s ease-out; }
+    @keyframes pop { from { transform: translateY(10px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+    .mobile-menu { display: none; }
+    @media (max-width: 1050px) {
+      .sidebar { width: 215px; }
+      .content { padding: 25px 22px 35px; }
+      .topbar { padding: 0 22px; }
+      .layout { grid-template-columns: minmax(0,1.2fr) minmax(250px,.8fr); gap: 15px; }
+      .panel { padding: 18px; }
+    }
+    @media (max-width: 780px) {
+      .sidebar { width: 68px; padding: 20px 9px; }
+      .brand { padding: 0 3px 28px; justify-content: center; }
+      .brand > div:last-child, .nav-label, .nav button .nav-text, .help-card { display: none; }
+      .nav button { justify-content: center; padding: 12px 5px; }
+      .nav button span { width: auto; }
+      .side-bottom { padding: 0; }
+      .topbar { height: 68px; padding: 0 15px; }
+      .content { padding: 22px 15px 30px; }
+      .layout { grid-template-columns: 1fr; }
+      .stats { gap: 10px; }
+      .stat { padding: 14px 12px; gap: 9px; }
+      .stat-icon { width: 36px; height: 36px; font-size: 17px; }
+      .stat strong { font-size: 17px; }
+      .hero { padding: 22px; }
+      .profile .profile-info { display: none; }
+    }
+    @media (max-width: 520px) {
+      .welcome { align-items: flex-start; flex-direction: column; }
+      .welcome .btn { width: 100%; }
+      .hero { align-items: flex-start; flex-direction: column; }
+      .hero .btn { width: 100%; }
+      .stats { grid-template-columns: 1fr; }
+      .stat { padding: 13px 16px; }
+      .fields { grid-template-columns: 1fr; }
+      .field.full { grid-column: auto; }
+      .top-actions { gap: 9px; }
+      .crumb { font-size: 11px; }
+      .panel-head { flex-direction: column; }
+      .form-actions .btn { flex: 1; }
+    }
+  
+:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+.status.enrolled{color:var(--green);background:#e2f7ee}
+.gate{max-width:820px;margin:0 auto;padding:40px 18px}.gate .grid{display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));margin:22px 0}
+.gate h1{margin-top:14px}.gate .panel{margin:0}
+.tbl{width:100%;border-collapse:collapse;font-size:12px}.tbl th,.tbl td{text-align:left;padding:10px 8px;border-bottom:1px solid var(--line);white-space:nowrap}.tbl th{color:var(--muted);font-size:10px;text-transform:uppercase;letter-spacing:.6px}
+.pdfv{background:#eef1f7;border-radius:8px;padding:10px;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}.pdfv .pg{display:block;width:100%;height:auto;margin:0 0 10px;background:#fff;box-shadow:0 2px 10px rgba(0,0,0,.15)}.pdfv .pg:last-child{margin-bottom:0}.pgf{width:100%;height:70vh;border:0;background:#fff}.mod.pdfm{padding:0;place-items:stretch}.mod.pdfm .box{max-width:none;max-height:none;width:100%;height:100%;border-radius:0;padding:0;display:flex;flex-direction:column;overflow:hidden}.pdfh{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;padding:calc(10px + env(safe-area-inset-top,0px)) 12px 10px;border-bottom:1px solid var(--line);background:#fff}.pdfz{display:flex;align-items:center;gap:6px}.pdfz .btn{padding:8px 12px}.pdfz span{min-width:44px;text-align:center;font-size:12px;font-weight:700}.pdfs{flex:1;overflow:auto;-webkit-overflow-scrolling:touch;background:#eef1f7;padding:8px}.pdfs .pdfv{padding:0;border-radius:0;background:transparent}.pdfs .pgf{height:100%;min-height:80vh}
+.filecard{display:flex;align-items:center;gap:12px;width:100%;text-align:left;background:#fff;border:1px solid var(--line);border-radius:12px;padding:12px 14px;color:var(--ink)}.filecard:hover{background:#f6f9ff;border-color:#c5d6f5}.filecard strong{display:block;font-size:13px}.filecard small{display:block;color:var(--muted);font-size:11px}.filecard .go{margin-left:auto;color:var(--blue);font-size:11px;font-weight:800;white-space:nowrap}
+.tw{overflow-x:auto}.tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+.mod{position:fixed;inset:0;background:rgba(20,43,85,.55);display:grid;place-items:center;padding:16px;z-index:20}
+.mod .box{background:#fff;border-radius:16px;padding:22px;max-width:520px;width:100%;max-height:90vh;overflow:auto}
+.chk{display:flex;gap:9px;align-items:center;padding:7px 0;font-size:12px;border-bottom:1px solid var(--line)}.chk i{font-style:normal;font-weight:800}.ok{color:var(--green)}.no{color:#b13b4a}
+.thumb{max-width:100%;max-height:170px;border-radius:8px;border:1px solid var(--line);margin-top:6px;display:block;cursor:zoom-in}
+.err{color:#b13b4a;font-size:11px;min-height:16px}
+.nf{padding:10px 0;border-bottom:1px solid var(--line);font-size:12px}.nf small{color:var(--muted);display:block}
+.count{margin-left:auto;background:#ef5c67;color:#fff;border-radius:99px;font-size:10px;padding:0 7px;font-weight:800}.nav button .count{width:auto}
+.sw{color:#c9d6ee;background:transparent;border:1px solid #35517e;border-radius:11px;padding:11px;width:100%}
+.sidebar{position:sticky;top:0;align-self:flex-start;height:100vh;overflow-y:auto}
+@media(max-width:780px){.sw .t{display:none}}
+.paper{background:#fff;border:1px solid var(--line);border-radius:12px;padding:16px;box-shadow:var(--shadow)}.tbl tr.me td{background:#fff3c4}
+.rule{display:flex;align-items:center;gap:9px;font-size:12px;color:var(--muted);padding:3px 0}.rule .rc{width:18px;height:18px;border-radius:50%;border:1.5px solid #b9c4d8;display:grid;place-items:center;font-size:11px;font-weight:900;color:#fff;flex-shrink:0;line-height:1}.rule.ok{color:var(--green)}.rule.ok .rc{background:var(--green);border-color:var(--green)}
+.rule.bad{color:#b13b4a}.rule.bad .rc{border-color:#d9626f;color:#b13b4a;background:#fff}
+
+/* ---- backgrounds ---- */
+body{background:var(--bg)}
+body::before{content:"";position:fixed;inset:-170px;z-index:-1;pointer-events:none;background:url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22170%22 height=%22170%22 viewBox=%220 0 170 170%22 fill=%22none%22 stroke=%22%232864dc%22 stroke-opacity=%22.08%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22%3E%0A%3Cg transform=%22translate(18 20)%22%3E%3Cpath d=%22M0 14 L26 2 L52 14 L26 26 Z%22/%3E%3Cpath d=%22M12 20 v12 c9 7 19 7 28 0 v-12%22/%3E%3Cpath d=%22M52 14 v14%22/%3E%3C/g%3E%0A%3Cg transform=%22translate(104 92)%22%3E%3Crect x=%220%22 y=%220%22 width=%2232%22 height=%2240%22 rx=%223%22/%3E%3Cpath d=%22M9 0 v40 M16 12 h11 M16 20 h11%22/%3E%3C/g%3E%0A%3Cg transform=%22translate(20 98)%22%3E%3Cpath d=%22M4 40 l32 -32 l10 10 l-32 32 l-15 5 z%22/%3E%3Cpath d=%22M36 8 l10 10%22/%3E%3C/g%3E%0A%3Cg transform=%22translate(108 14)%22%3E%3Ccircle cx=%2212%22 cy=%2212%22 r=%2210%22/%3E%3Cpath d=%22M12 6 v7 l5 3%22/%3E%3C/g%3E%0A%3Ccircle cx=%2286%22 cy=%2270%22 r=%222.5%22/%3E%3Ccircle cx=%22150%22 cy=%2270%22 r=%222.5%22/%3E%3Ccircle cx=%2276%22 cy=%22154%22 r=%222.5%22/%3E%0A%3C/svg%3E");animation:drift 45s linear infinite;will-change:transform}
+body.welcome-bg::after{content:"";position:fixed;inset:-20%;z-index:-1;pointer-events:none;background:radial-gradient(circle at 20% 30%,rgba(40,100,220,.22),transparent 35%),radial-gradient(circle at 80% 25%,rgba(22,132,91,.16),transparent 30%),radial-gradient(circle at 60% 80%,rgba(40,100,220,.14),transparent 35%);animation:floaty 18s ease-in-out infinite alternate;will-change:transform}
+.bob{animation:bob 3.2s ease-in-out infinite}
+@keyframes drift{to{transform:translate(170px,170px)}}
+@keyframes floaty{from{transform:translate(-3%,-2%) scale(1)}to{transform:translate(3%,3%) scale(1.08)}}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+@media (prefers-reduced-motion:reduce){body::before,body::after,.bob{animation:none!important}}
+body.welcome-bg{background:url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 1200 320%22 preserveAspectRatio=%22xMidYMax slice%22%3E%0A%3Cg fill=%22%232864dc%22 fill-opacity=%22.10%22%3E%3Crect x=%220%22 y=%22230%22 width=%221200%22 height=%2290%22/%3E%0A%3Crect x=%2260%22 y=%22170%22 width=%22200%22 height=%22150%22/%3E%3Crect x=%22940%22 y=%22160%22 width=%22210%22 height=%22160%22/%3E%0A%3Crect x=%22300%22 y=%22200%22 width=%22150%22 height=%22120%22/%3E%3Crect x=%22760%22 y=%22195%22 width=%22160%22 height=%22125%22/%3E%3C/g%3E%0A%3Cg fill=%22%232864dc%22 fill-opacity=%22.16%22%3E%3Cpath d=%22M470 120 L600 50 L730 120 Z%22/%3E%3Crect x=%22480%22 y=%22120%22 width=%22240%22 height=%2230%22/%3E%0A%3Crect x=%22490%22 y=%22150%22 width=%2222%22 height=%22130%22/%3E%3Crect x=%22540%22 y=%22150%22 width=%2222%22 height=%22130%22/%3E%3Crect x=%22590%22 y=%22150%22 width=%2222%22 height=%22130%22/%3E%3Crect x=%22640%22 y=%22150%22 width=%2222%22 height=%22130%22/%3E%3Crect x=%22690%22 y=%22150%22 width=%2222%22 height=%22130%22/%3E%0A%3Crect x=%22465%22 y=%22280%22 width=%22270%22 height=%2214%22/%3E%3Crect x=%22450%22 y=%22294%22 width=%22300%22 height=%2226%22/%3E%3C/g%3E%0A%3Cg fill=%22%2316845b%22 fill-opacity=%22.14%22%3E%3Ccircle cx=%22150%22 cy=%22215%22 r=%2234%22/%3E%3Ccircle cx=%221060%22 cy=%22205%22 r=%2238%22/%3E%3Ccircle cx=%22390%22 cy=%22240%22 r=%2226%22/%3E%3Ccircle cx=%22850%22 cy=%22238%22 r=%2228%22/%3E%3C/g%3E%0A%3Cg fill=%22%23ffffff%22 fill-opacity=%22.55%22%3E%3Crect x=%22598%22 y=%2280%22 width=%224%22 height=%220%22/%3E%3C/g%3E%0A%3C/svg%3E") center bottom/100% auto no-repeat,radial-gradient(circle at 12% 18%,rgba(40,100,220,.20),transparent 45%),radial-gradient(circle at 88% 65%,rgba(22,132,91,.14),transparent 45%),linear-gradient(160deg,#eaf2ff 0%,#d3e3ff 55%,#f5f7fc 100%);background-attachment:fixed}
+@media print{body::before,body::after{display:none!important}body *{visibility:hidden}.rcpt,.rcpt *{visibility:visible}.mod{position:absolute!important;inset:0 auto auto 0!important;background:none!important;display:block!important;padding:0!important}.mod .box{max-height:none!important;overflow:visible!important;box-shadow:none!important}}
+.pager{display:flex;justify-content:space-between;align-items:center;gap:10px;margin:26px 0 10px;flex-wrap:wrap}.pager .btn{width:auto;min-width:110px}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<script>
+const $=s=>document.querySelector(s),peso=n=>'₱'+Number(n).toLocaleString(),KEY='enrollease-ppt-v2',SK='enrollease-sheet-url';
+const esc=t=>String(t??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+let D,S={role:null,id:null,uid:null,login:null,mode:'in',LF:{id:'',pw:'',pw2:'',off:''},lerr:'',view:'form',hist:[],tab:'All',modal:null,err:'',DR:{}};
+let SHEET_URL='';/* saved from the officer's Google Sheet page */
+const OFFICES=[{k:'ncssc',n:'NCSSC Office'},{k:'fits',n:'FITS Office'},{k:'univ',n:'University Fines Office'}];
+const COLLEGE='College of Information Technology Education',COURSE='BSIT';
+const offName=k=>(OFFICES.find(o=>o.k===k)||{n:''}).n;
+const mkPO=()=>{const o={};OFFICES.forEach(x=>{o[x.k]={ref:'',shot:[],choice:'',paid:false}});return o};
+const F=()=>({id:'',name:'',college:COLLEGE,course:COURSE,section:'',clr:[],rcp:[],po:mkPO()});
+const E=()=>Object.assign(F(),{submitted:true,paid:false,enr:'Pending',listed:false,notifs:[],unread:0,updated:'',rc:[],term:(D&&D.term)||curTerm()});
+function seed(){D={st:{},on:{}}}
+function backup(){const o={v:1,D,A,AO,AV,PO,R},b=new Blob([JSON.stringify(o)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='enrollment-backup-'+new Date().toISOString().slice(0,10)+'.json';document.body.appendChild(a);a.click();a.remove();notify('Backup downloaded.')}
+function restoreFile(inp){const f=inp.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{const o=JSON.parse(r.result);if(!o||!o.D||!o.D.st)throw 0;localStorage.setItem(KEY,JSON.stringify(o.D));localStorage.setItem(AK,JSON.stringify(o.A||{}));localStorage.setItem(OK2,JSON.stringify(o.AO||{}));localStorage.setItem(AVK,JSON.stringify(o.AV||{}));localStorage.setItem(PK,JSON.stringify(o.PO||PO));if(o.R)localStorage.setItem(RK,JSON.stringify(o.R));load();S.modal=null;notify('Backup restored.');render()}catch(e){notify('That file is not a valid backup.')}};r.readAsText(f)}
+function load(){try{D=JSON.parse(localStorage.getItem(KEY))}catch(e){}if(!D||!D.st)seed();if(!D.on)D.on={};initTerm();try{SHEET_URL=localStorage.getItem(SK)||''}catch(e){}try{A=JSON.parse(localStorage.getItem(AK))||{}}catch(e){A={}}try{AO=JSON.parse(localStorage.getItem(OK2))||{}}catch(e){AO={}}try{AV=JSON.parse(localStorage.getItem(AVK))||{}}catch(e){AV={}}try{const x=JSON.parse(localStorage.getItem(PK));if(x)for(const k in PO)Object.assign(PO[k],x[k]||{})}catch(e){}try{R=JSON.parse(localStorage.getItem(RK))}catch(e){}rNorm();}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(D))}catch(e){}}
+const REC=[['261-1234','Eñeja, Ryza L.','BSIT','1A',0,0],['261-3675','Lalica, Mike James R.','BSIT','1B',0,0],['251-0992','Ocumen, Ruby Ann D.','BSIT','2A',0,25],['251-4532','Pelmoka, Alcris R.','BSIT','2C',40,50],['241-4650','Corbe, Marilyn S.','BSIT','3B',0,0],['241-0814','Maluping, Shiela May M.','BSIT','3A',0,150],['231-2001','Bayatan, Rachel D.','BSIT','4B',20,100],['231-3045','Hernandez, Maegan D.','BSIT','4A',0,0]];
+/* NCSSC Office: 50 · FITS Office: membership 100 + college 500 + department fines · University Fines Office: university fines */
+function recFor(id){const r=REC.find(x=>x[0]===String(id).trim());return r?{d:r[4],u:r[5]}:{d:0,u:0}}
+const lines=(s,k)=>{const r=recFor(s.id);return k==='ncssc'?[['NCSSC Fee',50]]:k==='fits'?[['Membership Fee',100],['College Fee',500]].concat(r.d?[['Department Fines',r.d]]:[]):r.u?[['University Fines',r.u]]:[]};
+const amt=(s,k)=>lines(s,k).reduce((a,x)=>a+x[1],0);
+const total=s=>OFFICES.reduce((a,o)=>a+amt(s,o.k),0);
+const reqOf=s=>OFFICES.filter(o=>amt(s,o.k)>0);
+const poStat=(s,k)=>{const p=s.po[k];return p.paid?'Confirmed':p.choice==='paid'?'Pending':'Unpaid'};
+const allPaid=s=>reqOf(s).every(o=>s.po[o.k].paid);
+const unpaidAmt=s=>reqOf(s).filter(o=>!s.po[o.k].paid).reduce((a,o)=>a+amt(s,o.k),0);
+const payStat=s=>allPaid(s)?'Confirmed':reqOf(s).some(o=>s.po[o.k].choice==='paid')?'Pending':'Unpaid';
+const badge=t=>`<span class="status ${t.toLowerCase()}">${t}</span>`;
+const yrOf=s=>{const m=String(s.section||'').match(/\d+/);return m?+m[0]:''};
+const sv=v=>String(v||'').trim().toUpperCase();
+const cmp=(a,b)=>sv(a.course).localeCompare(sv(b.course))||(yrOf(a)||99)-(yrOf(b)||99)||sv(a.section).localeCompare(sv(b.section),undefined,{numeric:true})||String(a.name||'').trim().localeCompare(String(b.name||'').trim(),undefined,{sensitivity:'base'});
+const me=()=>D.st[S.id],subs=()=>Object.values(D.st).sort(cmp);
+let tt;function notify(m){const t=$('#toast');t.textContent=m;t.classList.add('show');clearTimeout(tt);tt=setTimeout(()=>t.classList.remove('show'),3400)}
+function onotif(k,m,sid){(D.on[k]=D.on[k]||[]).unshift({m,sid:sid||'',t:new Date().toLocaleString(),r:false});save()}
+const ounr=k=>(D.on[k]||[]).filter(n=>!n.r).length;
+function notif(s,m){s.notifs.unshift({m,t:new Date().toLocaleString()});s.unread++}
+/* ---- Semester & e-receipts ---- */
+function curTerm(){const d=new Date(),m=d.getMonth()+1,y=d.getFullYear();return m>=8?'1st Semester, S.Y. '+y+'-'+(y+1):m<=5?'2nd Semester, S.Y. '+(y-1)+'-'+y:'Summer '+y}
+const rcOf=(s,k)=>(s.rc||[]).find(q=>q.k===k&&q.term===D.term);
+const rcNo=(s,k)=>{const r=rcOf(s,k);return r?r.no:''};
+function mkReceipt(x,k,by,date){x.rc=x.rc||[];let r=rcOf(x,k);if(r)return r;
+ D.rn=D.rn||{};const n=(D.rn[k]=(D.rn[k]||0)+1),code={ncssc:'NCSSC',fits:'FITS',univ:'UNIV'}[k];
+ r={no:code+'-'+new Date().getFullYear()+'-'+String(n).padStart(4,'0'),k,term:D.term,amount:amt(x,k),items:lines(x,k),ref:x.po[k].ref||'',date:date||new Date().toLocaleString(),by:by||S.uid||offName(k)};
+ x.rc.push(r);return r}
+function initTerm(){if(!D.term)D.term=curTerm();if(!D.sched)D.sched={from:'',to:'',late:false};for(const id in D.st){const s=D.st[id];s.rcp=rcl(s);s.clr=fl(s.clr);OFFICES.forEach(o=>{if(s.po&&s.po[o.k])s.po[o.k].shot=fl(s.po[o.k].shot)});if(!s.rc)s.rc=[];if(!s.term)s.term=D.term;
+ if(s.term===D.term)OFFICES.forEach(o=>{const p=s.po&&s.po[o.k];if(p&&p.paid&&!rcOf(s,o.k))mkReceipt(s,o.k,'Office (earlier record)',p.date)})}save()}
+function rollover(s){if(s.term===D.term)return;s.po=mkPO();s.enr='Pending';s.paid=false;s.listed=false;s.adv=null;s.term=D.term;notif(s,'New semester: '+D.term+'. Your enrollment for this semester starts now. Your old receipts stay in My Receipts.')}
+function setTerm(){const v=($('#term').value||'').trim();if(!v||v===D.term)return notify('Semester not changed.');if(!confirm('Start a new semester: '+v+'? Every student starts a new enrollment. Old receipts stay saved.'))return;
+ D.term=v;Object.values(D.st).forEach(x=>{rollover(x);sync(x)});save();notify('New semester started: '+v);render()}
+const fl=v=>Array.isArray(v)?v:(v&&v.n?[v]:[]);
+const rcl=x=>fl(x.rcp);
+const pics=(v,t)=>{const l=fl(v);return l.map((f,i)=>f.u?`<div class="hint">${t}${l.length>1?' '+(i+1):''}</div><img class="thumb" src="${f.u}" alt="${t}">`:'').join('')};
+const hasRc=()=>!!(S.id&&me()&&(me().rc||[]).length);
+function viewRc(id,no){S.rcId=id;S.rcNo=no;S.modal='rc';render()}
+const hist=x=>{const l=(x.rc||[]).slice().reverse();return l.length?`<div class="hint" style="margin-top:10px">Receipts on file</div>${l.map(r=>`<div class="fee-line" style="padding:3px 0"><span>${esc(r.term)} · ${offName(r.k)} · ${peso(r.amount)}</span><strong><button class="link-btn" onclick="viewRc('${x.id}','${r.no}')">${r.no}</button></strong></div>`).join('')}`:''};
+function rcModal(){const x=D.st[S.rcId],r=x&&(x.rc||[]).find(q=>q.no===S.rcNo);if(!r)return '';
+ return box(`<div class="rcpt"><div style="text-align:center"><b style="color:var(--navy)">EnrollEase</b><div class="hint">Official E-Receipt</div></div>
+ <div style="text-align:center;font-weight:800;color:var(--navy);font-size:19px;margin:8px 0 12px">${r.no}</div>
+ <div class="fee-line"><span>Student</span><strong>${esc(x.name)}</strong></div><div class="fee-line"><span>ID Number</span><strong>${x.id}</strong></div><div class="fee-line"><span>Course / Section</span><strong>${esc(x.course)} ${esc(x.section)}</strong></div>
+ <div class="fee-line"><span>Office</span><strong>${offName(r.k)}</strong></div><div class="fee-line"><span>Semester</span><strong>${esc(r.term)}</strong></div>
+ <div class="fee-line"><span>Date</span><strong>${esc(r.date)}</strong></div>${r.ref?`<div class="fee-line"><span>Payment ref. no.</span><strong>${esc(r.ref)}</strong></div>`:''}<div class="fee-line"><span>Confirmed by</span><strong>${esc(r.by)}</strong></div>
+ ${(r.items||[]).map(l=>`<div class="fee-line" style="padding:3px 0"><span>${l[0]}</span><strong>${peso(l[1])}</strong></div>`).join('')}
+ <div class="fee-line fee-total"><span>Total paid</span><strong>${peso(r.amount)}</strong></div>
+ <div style="text-align:center;margin-top:8px"><span class="status confirmed">PAID</span></div>
+ </div>
+ <div class="form-actions"><button class="btn btn-light" onclick="window.print()">Print / Save PDF</button>${closeB}</div>`)}
+function sRcpt(){if(!S.id)return need();const s=me(),l=(s.rc||[]).slice().reverse();
+ return `<div class="welcome"><div><div class="eyebrow">Proof of payment</div><h1>My Receipts</h1><p>Your e-receipts from every office and semester. Show these if an office asks for proof of payment.</p></div></div>
+ ${l.length?l.map(r=>`<div class="panel" style="max-width:560px"><div class="panel-head"><div><h3>${offName(r.k)}</h3><p>${esc(r.term)}</p></div><span class="status confirmed">Paid</span></div><div class="fee-line"><span>Receipt No.</span><strong>${r.no}</strong></div><div class="fee-line"><span>Amount</span><strong>${peso(r.amount)}</strong></div><div class="fee-line"><span>Date</span><strong>${esc(r.date)}</strong></div><div class="form-actions" style="justify-content:flex-start"><button class="btn btn-light" onclick="viewRc('${s.id}','${r.no}')">View receipt</button></div></div>`).join(''):'<div class="panel" style="max-width:560px"><p class="hint" style="margin:0">No receipts yet. They appear here after an office confirms your payment.</p></div>'}`}
+/* ---- Faculty Adviser ---- */
+const ADVISERS=[{id:'ADVISER-001',pw:'Adv@0001',courses:[]}],AVK='enrollease-advisers';let AV={};
+const advOk=s=>!!(s.adv&&s.adv.ok)||s.enr==='Enrolled';
+const mineAdv=s=>{if(!S.courses||!S.courses.length)return true;const n=v=>String(v||'').replace(/[\s\-]/g,'').toUpperCase(),c=n(s.course),k=[c,n(s.section),c+n(s.section)];return S.courses.some(x=>k.includes(n(x)))};
+const waitAdv=s=>mineAdv(s)&&allPaid(s)&&!advOk(s);
+const aStat=s=>advOk(s)?'Approved':allPaid(s)?'Awaiting':'Not yet paid';
+const abadge=s=>advOk(s)?'<span class="status confirmed">Approved</span>':allPaid(s)?'<span class="status pending">Awaiting approval</span>':'<span class="status unpaid">Not yet paid</span>';
+const paidCount=s=>reqOf(s).filter(o=>s.po[o.k].paid).length+'/'+reqOf(s).length+' offices paid';
+/* ---- Google Sheet ---- */
+const HEAD=['ID Number','Name','College','Course','Section','NCSSC Fee','Membership Fee','College Fee','Department Fines','University Fines','Total','NCSSC Office Status','FITS Office Status','University Fines Status','NCSSC Ref No.','FITS Ref No.','University Ref No.','Enrollment Status','Adviser Approval','Semester','NCSSC Receipt No.','FITS Receipt No.','University Receipt No.','Year Level'];
+const stOrNA=(s,k)=>amt(s,k)?poStat(s,k):'N/A';
+const rowOf=s=>{const r=recFor(s.id);return[s.id,s.name,s.college||'',s.course,s.section,50,100,500,r.d,r.u,total(s),stOrNA(s,'ncssc'),stOrNA(s,'fits'),stOrNA(s,'univ'),s.po.ncssc.ref||'',s.po.fits.ref||'',s.po.univ.ref||'',s.enr,advOk(s)?'Approved':allPaid(s)?'Awaiting Adviser':'Pending',s.term||'',rcNo(s,'ncssc'),rcNo(s,'fits'),rcNo(s,'univ'),yrOf(s)]};
+function sync(s){s.updated=new Date().toLocaleString();save();
+ if(!SHEET_URL)return;fetch(SHEET_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({header:HEAD,row:rowOf(s)})}).catch(()=>notify('Saved here, but could not reach Google Sheet'))}
+/* ---- files ---- */
+const gp=(o,k)=>k.split('.').reduce((a,x)=>a&&a[x],o);
+function sp(o,k,v){const a=k.split('.'),l=a.pop();a.reduce((x,y)=>x[y],o)[l]=v}
+function pick(inp,k){const f=inp.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{const done=u=>{sp(S.DR,k,{n:f.name,u});render()},im=new Image();im.onload=()=>{const c=document.createElement('canvas'),q=Math.min(1,480/im.width);c.width=im.width*q;c.height=im.height*q;c.getContext('2d').drawImage(im,0,0,c.width,c.height);done(c.toDataURL('image/jpeg',.6))};im.onerror=()=>done('');im.src=r.result};r.readAsDataURL(f)}
+const up=(k,t)=>{const f=gp(S.DR,k)||{n:'',u:''};return `<div class="upload-box"><input type="file" accept="image/*" onchange="pick(this,'${k}')"><p>${t}</p>${f.n?`<div style="margin-top:8px">${f.u?`<img class="thumb" src="${f.u}" alt="${esc(f.n)}">`:''}<div style="display:flex;justify-content:space-between;align-items:center;gap:8px"><span class="hint">✔ ${esc(f.n)}</span><button type="button" class="link-btn" onclick="delFile('${k}')">Remove</button></div></div>`:''}</div>`}
+function delFile(k){sp(S.DR,k,{n:'',u:''});render()}
+const MAXP=3;
+function pickMany(inp,k){const fs=Array.from(inp.files||[]);inp.value='';if(!fs.length)return;const cur=fl(gp(S.DR,k));sp(S.DR,k,cur);
+ const room=MAXP-cur.length;if(room<=0)return notify('Maximum of '+MAXP+' pictures only. Remove one to add another.');
+ if(fs.length>room)notify('Only '+MAXP+' pictures allowed. Extra files were skipped.');
+ const take=fs.slice(0,room);let left=take.length;const done=()=>{if(--left<=0)render()};
+ take.forEach(f=>{const r=new FileReader();r.onerror=done;r.onload=()=>{const add=u=>{cur.push({n:f.name,u});done()},im=new Image();im.onload=()=>{const c=document.createElement('canvas'),q=Math.min(1,800/im.width);c.width=im.width*q;c.height=im.height*q;c.getContext('2d').drawImage(im,0,0,c.width,c.height);add(c.toDataURL('image/jpeg',.6))};im.onerror=()=>add('');im.src=r.result};r.readAsDataURL(f)})}
+function openPv(u){closePv();S.pvz=100;const d=document.createElement('div');d.id='pv';d.className='mod pdfm';d.style.zIndex=30;
+ d.innerHTML='<div class="box"><div class="pdfh"><strong>Picture</strong><div class="pdfz"><button class="btn btn-light" onclick="pvZoom(-50)">−</button><span id="pvz">100%</span><button class="btn btn-light" onclick="pvZoom(50)">+</button><button class="btn btn-light" onclick="closePv()">Close</button></div></div><div class="pdfs"><img id="pvi" alt="Picture" style="width:100%;display:block;background:#fff"></div></div>';
+ document.body.appendChild(d);d.querySelector('#pvi').src=u}
+function closePv(){const d=document.getElementById('pv');if(d)d.remove()}
+function pvZoom(n){S.pvz=Math.min(400,Math.max(100,(S.pvz||100)+n));const i=document.getElementById('pvi'),z=document.getElementById('pvz');if(i)i.style.width=S.pvz+'%';if(z)z.textContent=S.pvz+'%'}
+function viewMany(k,i){const f=fl(gp(S.DR,k))[i];if(f&&f.u)openPv(f.u)}
+function delMany(k,i){const c=fl(gp(S.DR,k));c.splice(i,1);sp(S.DR,k,c);render()}
+const upMany=(k,t)=>{const l=fl(gp(S.DR,k));return `<div class="upload-box"><input type="file" accept="image/*" multiple onchange="pickMany(this,'${k}')"><p>${t} Up to ${MAXP} pictures. Tap a picture to view it larger.</p>${l.map((f,i)=>`<div style="margin-top:8px">${f.u?`<img class="thumb" src="${f.u}" alt="${esc(f.n)}">`:''}<div style="display:flex;justify-content:space-between;align-items:center;gap:8px"><span class="hint">${i+1}. ${esc(f.n)}</span><span><button type="button" class="link-btn" onclick="viewMany('${k}',${i})">View</button><button type="button" class="link-btn" onclick="delMany('${k}',${i})">Remove</button></span></div></div>`).join('')}${l.length?`<div class="hint" style="margin-top:8px">${l.length} of ${MAXP} pictures added</div>`:''}</div>`};
+/* ---- shell ---- */
+function go(v){if(v!==S.view){S.hist.push(S.view);try{history.pushState({v:v,r:S.role},'')}catch(e){}}S.view=v;S.err='';render();window.scrollTo(0,0)}
+function navOrder(){return NAVS[S.role].map(n=>n[0])}
+function navBack(){const o=navOrder();let v=S.hist.pop();if(!v||v===S.view){const i=o.indexOf(S.view);v=i>0?o[i-1]:null}if(!v)return;S.view=v;S.err='';S.modal=null;try{history.replaceState({v:v,r:S.role},'')}catch(e){}render();window.scrollTo(0,0)}
+function navNext(){const o=navOrder(),i=o.indexOf(S.view);if(i>=0&&i<o.length-1){S.modal=null;go(o[i+1])}}
+function pager(){const o=navOrder(),i=o.indexOf(S.view),nm=k=>NAVS[S.role].find(n=>n[0]===k)[2],canB=S.hist.length>0||i>0,canN=i>=0&&i<o.length-1;
+ if(!canB&&!canN)return '';
+ return `<div class="pager">${canB?'<button class="btn btn-light" onclick="navBack()">Back</button>':'<span></span>'}${canN?'<button class="btn btn-primary" onclick="navNext()">Next</button>':'<span></span>'}</div>`}
+window.addEventListener('popstate',e=>{if(!S.role)return;const st=e.state,ok=st&&st.r===S.role&&NAVS[S.role].some(n=>n[0]===st.v);
+ if(ok){S.view=st.v;S.modal=null;S.err='';S.hist.pop();render();window.scrollTo(0,0)}else{try{history.pushState({v:S.view,r:S.role},'')}catch(x){}}});
+function enter(role){S.role=role;S.hist=[];if(role==='officer'&&!S.office)S.office='ncssc';S.view=role==='student'?'form':'list';try{history.pushState({v:S.view,r:role},'')}catch(e){}S.tab=role==='adviser'?'Awaiting':'All';S.DR=Object.assign(F(),{id:S.uid||S.id||''});if(S.id&&me())S.DR=JSON.parse(JSON.stringify(me()));S.DR.rcp=rcl(S.DR);S.DR.clr=fl(S.DR.clr);OFFICES.forEach(o=>{const p=S.DR.po&&S.DR.po[o.k];if(p)p.shot=fl(p.shot)});render()}
+function out(){S.hist=[];S.courses=null;S.role=null;S.office=null;S.id=null;S.uid=null;S.login=null;S.modal=null;render()}
+/* ---- log in ---- */
+const hasA=id=>Object.prototype.hasOwnProperty.call(A,id);
+function openLogin(role){SH.pw=SH.pw2=false;S.login=role;S.mode='in';S.LF={id:'',pw:'',pw2:'',off:''};S.lerr='';render()}
+function backGate(){S.login=null;S.lerr='';render()}
+function setMode(m){SH.pw=SH.pw2=false;S.mode=m;S.lerr='';S.LF.pw='';S.LF.pw2='';render()}
+function skipLogin(){const r=S.login;if(r==='officer'&&S.mode==='up'&&S.LF.off)S.office=S.LF.off;S.login=null;S.uid=null;S.id=null;enter(r)}
+const EYE='<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>',EYEOFF='<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>',SH={pw:false,pw2:false};
+const RULES=[['6 to 8 characters',p=>p.length>=6&&p.length<=8],['Capital letter (A-Z)',p=>/[A-Z]/.test(p)],['Small letter (a-z)',p=>/[a-z]/.test(p)],['Number (0-9)',p=>/\d/.test(p)],['Symbol (e.g. @ # !)',p=>/[^A-Za-z0-9]/.test(p)]];
+const ruleList=p=>!p?'':RULES.map(r=>{const ok=r[1](p||'');return `<div class="rule ${ok?'ok':'bad'}"><span class="rc">${ok?'&#10003;':'&#10005;'}</span>${r[0]}</div>`}).join('');
+function updRules(){const b=$('#rules');if(b)b.innerHTML=ruleList(S.LF.pw)}
+function tgl(k){SH[k]=!SH[k];const i=$('#in-'+k);if(i)i.type=SH[k]?'text':'password';const b=$('#eye-'+k);if(b)b.innerHTML=SH[k]?EYEOFF:EYE}
+const pwBox=(k,val,ph,ac,ml)=>`<div style="position:relative"><input id="in-${k}" type="${SH[k]?'text':'password'}" ${ml?'maxlength="8"':''} style="padding-right:44px" value="${esc(val)}" oninput="S.LF.${k}=this.value;if('${k}'==='pw')updRules()" autocomplete="${ac}"><button type="button" id="eye-${k}" aria-label="Show or hide password" onclick="tgl('${k}')" style="position:absolute;right:6px;top:50%;transform:translateY(-50%);border:0;background:none;color:var(--muted);padding:6px;display:grid;place-items:center">${SH[k]?EYEOFF:EYE}</button></div>`;
+function pwErr(pw,pw2){if(RULES.some(r=>!r[1](pw)))return 'Your password does not meet all the rules yet. Please try again.';if(pw!==pw2)return 'Passwords do not match. Please try again.';return ''}
+function doLogin(){const f=S.LF,id=(f.id||'').trim(),pw=f.pw||'',bad=m=>{S.lerr=m;render()},off=S.login==='officer',up=S.mode==='up';
+ if(!id&&!pw)return skipLogin();
+ if(!id||!pw)return bad('Type both your ID Number and password, or tap Skip.');
+ if(S.login==='adviser'){const low=id.toLowerCase(),def=ADVISERS.find(x=>x.id.toLowerCase()===low),key=Object.keys(AV).find(k=>k.toLowerCase()===low);
+  if(up){if(def||key)return bad('This ID Number already has an account. Please log in.');const m=pwErr(pw,f.pw2);if(m)return bad(m);const cs=(f.crs||'').split(',').map(x=>x.trim().toUpperCase()).filter(Boolean);AV[id]={pw,courses:cs};try{localStorage.setItem(AVK,JSON.stringify(AV))}catch(e){}S.courses=cs}
+  else{const acc=def?{pw:def.pw,courses:def.courses}:key?AV[key]:null;if(!acc||acc.pw!==pw)return bad('Wrong ID Number or password.');S.courses=acc.courses||[]}
+  S.login=null;S.uid=id;enter('adviser');if(up)notify('Account created. Welcome!');return}
+ if(off){const low=id.toLowerCase(),def=OFFICERS.find(x=>x.id.toLowerCase()===low),key=Object.keys(AO).find(k=>k.toLowerCase()===low);
+  if(up){if(def||key)return bad('This ID Number is already used by the '+offName(def?def.office:AO[key].office)+'. Each office account needs its own ID Number (example: FITS-002). Please type a different ID Number.');if(!f.off)return bad('Please choose your office.');const m=pwErr(pw,f.pw2);if(m)return bad(m);AO[id]={pw,office:f.off};try{localStorage.setItem(OK2,JSON.stringify(AO))}catch(e){}S.office=f.off}
+  else{const acc=def?{pw:def.pw,office:def.office}:key?AO[key]:null;if(!acc||acc.pw!==pw)return bad('Wrong ID Number or password.');S.office=acc.office}
+  S.login=null;S.uid=id;enter('officer');if(up)notify('Account created. Welcome!');return}
+ if(up){if(hasA(id))return bad('This ID Number already has an account. Please log in.');const m=pwErr(pw,f.pw2);if(m)return bad(m);A[id]=pw;try{localStorage.setItem(AK,JSON.stringify(A))}catch(e){}}
+ else if(!hasA(id)||A[id]!==pw)return bad('Wrong ID Number or password.');
+ S.login=null;S.uid=id;S.id=D.st[id]?id:null;enter('student');if(up)notify('Account created. Welcome!')}
+function loginView(){const o=S.login==='officer',up=S.mode==='up',f=S.LF;
+ return `<div class="gate"><div style="font-size:15px;font-weight:800;color:var(--navy)">Online Enrollment System</div>
+ <h1>${up?'Create account':'Log in'}</h1>
+ <div class="panel" style="max-width:420px;margin-top:18px" onkeydown="if(event.key==='Enter')doLogin()"><div class="fields" style="grid-template-columns:1fr">
+ <div class="field"><label>ID Number</label><input value="${esc(f.id)}" oninput="S.LF.id=this.value" autocomplete="username"></div>
+ ${o&&up?`<div class="field"><label>Office</label><select onchange="S.LF.off=this.value"><option value=""></option>${OFFICES.map(x=>`<option value="${x.k}"${f.off===x.k?' selected':''}>${x.n}</option>`).join('')}</select></div>`:''}
+ ${S.login==='adviser'&&up?`<div class="field"><label>Course(s) you handle (optional)</label><input value="${esc(f.crs||'')}" oninput="S.LF.crs=this.value" placeholder="e.g. BSIT (blank = all students)"></div>`:''}
+ <div class="field"><label>Password</label>${pwBox('pw',f.pw,'',up?'new-password':'current-password',true)}${up?`<div id="rules" style="margin-top:8px">${ruleList(f.pw)}</div>`:''}</div>
+ ${up?`<div class="field"><label>Confirm password</label>${pwBox('pw2',f.pw2,'','new-password',true)}</div>`:''}</div>
+ <div class="err">${esc(S.lerr)}</div>
+ <div class="form-actions" style="justify-content:stretch"><button class="btn btn-primary" style="width:100%" onclick="doLogin()">${up?'Create account':'Log in'}</button></div>
+ <p class="hint" style="text-align:center;margin:14px 0 0">${up?'Already have an account?':'No account yet?'} <button class="link-btn" onclick="setMode('${up?'in':'up'}')">${up?'Log in':'Sign up'}</button></p></div>
+ <div class="form-actions" style="justify-content:flex-start"><button class="btn btn-light" onclick="backGate()">‹ Back</button></div></div>`}
+const NAVS={student:[['form','▤','Enrollment Form'],['rec','▧','Student Records'],['pay','₱','Payment'],['stat','◷','Enrollment Status'],['rcpt','▣','My Receipts']],officer:[['list','▤','Student List'],['log','▦','Payment Records'],['rec','▧','Student Records'],['pay','₱','Payment Info'],['sched','▤','Enrollment Schedule'],['sheet','▥','Google Sheet']],adviser:[['list','▤','Student List'],['log','▦','Approved Students']]};
+function render(){const r=$('#root');document.body.classList.toggle('welcome-bg',!S.role);
+ if(S.id&&!me())S.id=null;
+ if(!S.role){r.innerHTML=S.login?loginView():gate();return}
+ const st=S.role==='student',ad=S.role==='adviser',s=st&&S.id?me():null,ok=ad?'adv':(S.office||'ncssc'),pend=st?0:ad?subs().filter(waitAdv).length:subs().filter(x=>amt(x,ok)>0&&poStat(x,ok)==='Pending').length,nm=st?(s?s.name:'Student'):ad?'Faculty Adviser':offName(ok),ini=nm.split(/\s+/).slice(0,2).map(p=>p[0]).join('').toUpperCase();
+ const V=st?{form:sForm,rec:sRec,pay:sPay,stat:sStat,rcpt:sRcpt}:ad?{list:aList,log:aLog}:{list:oList,log:oLog,rec:oRec,pay:oPay,sched:oSched,sheet:oSheet};
+ r.innerHTML=`<div class="app"><aside class="sidebar"><div class="brand"><div class="brand-mark">E</div><div><strong>EnrollEase</strong><small>${st?'STUDENT':ad?'ADVISER':'OFFICER'}</small></div></div><div class="nav-label">Workspace</div>
+ <nav class="nav">${NAVS[S.role].map(([k,i,n])=>`<button class="${S.view===k?'active':''}" onclick="go('${k}')"><span>${i}</span><span class="nav-text">${n}</span>${k==='list'&&pend?`<span class="count">${pend}</span>`:''}</button>`).join('')}</nav>
+ <div class="side-bottom"><button class="sw" onclick="out()" aria-label="Log out"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/></svg><span class="t"> Log out</span></button></div></aside>
+ <main><header class="topbar"><div class="crumb">${st?'Student':ad?'Faculty Adviser':offName(ok)} <span style="padding:0 7px;color:#c0cada">/</span> <strong>${NAVS[S.role].find(n=>n[0]===S.view)[2]}</strong></div>
+ <div class="top-actions">${!st?`<button class="icon-button" aria-label="Notifications" onclick="S.modal='onf';render()"><span style="font-size:18px;line-height:1">💬</span>${ounr(ok)?'<i class="dot"></i>':''}</button>`:''}${st&&s?`<button class="icon-button" aria-label="Notifications" onclick="S.modal='nf';render()"><span style="font-size:18px;line-height:1">💬</span>${s.unread?'<i class="dot"></i>':''}</button>`:''}<div class="profile"><div class="avatar">${esc(ini)}</div><div class="profile-info"><strong>${esc(nm)}</strong><small>${S.uid||(st?'':ad?'Adviser':'Officer')}</small></div></div></div></header>
+ <div class="content">${V[S.view]()}${pager()}</div></main></div>${S.modal?modal():''}`;if(S.modal==='pdf')drawPdf()}
+function gate(){const b='width:100%;max-width:300px;padding:16px;font-size:18px;letter-spacing:2px;border-radius:14px;text-align:center';return `<div style="min-height:100vh;display:flex;flex-direction:column;padding:20px 22px"><div style="font-size:15px;font-weight:800;color:var(--navy)">Online Enrollment System</div>
+ <div style="flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:14px;width:100%;max-width:420px;margin:0 auto;padding-bottom:60px"><div class="bob" style="width:78px;height:78px;border-radius:22px;background:linear-gradient(135deg,var(--blue),var(--navy));display:grid;place-items:center;box-shadow:var(--shadow)"><svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10 12 5 2 10l10 5 10-5z"/><path d="M6 12v5c3 2 9 2 12 0v-5"/><path d="M22 10v6"/></svg></div><div style="text-align:center;margin-bottom:6px"><div style="font-size:28px;font-weight:800;color:var(--navy)">Welcome to EnrollEase</div><div style="color:var(--muted);font-size:14px">Enroll online. Choose your role to continue.</div></div><button class="btn btn-primary" style="${b}" onclick="openLogin('student')">STUDENT</button><button class="btn btn-primary" style="${b}" onclick="openLogin('officer')">OFFICER</button><button class="btn btn-primary" style="${b}" onclick="openLogin('adviser')">ADVISER</button></div></div>`}
+/* ---- student ---- */
+function need(){return `<div class="panel"><div class="panel-head"><div><h3>Fill up the Enrollment Form first</h3><p>Fill in your ID Number, Name, and Section to continue.</p></div></div><button class="btn btn-primary" onclick="go('form')">Go to Enrollment Form</button></div>`}
+function sForm(){const d=S.DR,s=S.id?me():null;
+ return `<div class="welcome"><div><div class="eyebrow">Online enrollment</div><h1>Enrollment Form</h1><p>Type your details and upload your old documents.</p></div></div>${schedBanner()}
+ <div class="panel"><div class="form-section" style="border-top:0;padding-top:0;margin-top:0"><h4><span class="number">1</span> Student Information</h4><div class="fields">
+ <div class="field"><label>ID Number *</label><input value="${esc(d.id)}" ${S.uid?'disabled':''} oninput="S.DR.id=this.value" placeholder="e.g. 241-0814"></div>
+ <div class="field"><label>Name *</label><input value="${esc(d.name)}" oninput="S.DR.name=this.value" placeholder="Last name, First name, Middle name"></div>
+ <div class="field"><label>Course</label><input value="BSIT" disabled></div>
+ <div class="field"><label>Section *</label><input value="${esc(d.section)}" oninput="S.DR.section=this.value" placeholder="e.g. 3A"></div></div></div>
+ <div class="form-section"><h4><span class="number">2</span> Old Clearance &amp; Past Semester Receipt</h4><div class="fields"><div class="field"><label>Picture(s) of old clearance *</label>${upMany('clr','Upload a clear picture.')}</div><div class="field"><label>Picture(s) of past semester receipt ${hasRc()?'(optional, your receipts are on file)':'*'}</label>${upMany('rcp','Upload a clear picture of each receipt. If you have 2 or 3 receipts, add them all.')}</div></div></div>
+ <div class="form-section"><h4><span class="number">3</span> Student Records</h4><p style="font-size:12px;color:var(--muted);margin:0 0 12px">Open the PDF to see your records of fees, fines and payments from your previous semester. These are not the payments for this enrollment.</p><button class="btn btn-light" onclick="go('rec')">▧ View Student Records PDF</button></div>
+ <div class="err">${S.err}</div><div class="form-actions"><button class="btn btn-primary" onclick="saveForm()">Save &amp; Continue →</button></div></div>`}
+function saveForm(){const d=S.DR,id=(d.id||'').trim();const sc=schedState();if(!sc.open&&!D.st[id]){S.err=sc.msg;return render()}if(!id||!d.name||!d.section){S.err='Please fill in your ID Number, Name, and Section.';return render()}
+ if(!fl(d.clr).length||(!rcl(d).length&&!hasRc())){S.err='Please upload your old clearance and past semester receipt.';return render()}
+ let s=D.st[id],isNew=!s;if(isNew)s=D.st[id]=Object.assign(E(),{id});Object.assign(s,{name:d.name,college:COLLEGE,course:COURSE,section:d.section,clr:fl(d.clr),rcp:rcl(d)});S.id=id;S.err='';
+ if(isNew)notif(s,'Your enrollment form was received. Status: Pending. Total to pay: '+peso(total(s))+'. See the Payment page for each office.');
+ sync(s);notify('Saved. Continue to payment.');go('pay')}
+/* ---- Student Records PDF (officer uploads, student views) ---- */
+const AK='enrollease-accounts',OFFICERS=[{id:'NCSSC-001',pw:'Ncssc@01',office:'ncssc'},{id:'FITS-001',pw:'Fits@001',office:'fits'},{id:'UNIV-001',pw:'Univ@001',office:'univ'}],OK2='enrollease-officers2';let A={},AO={},PO={ncssc:{qr:'',name:'',number:'',note:''},fits:{qr:'',name:'',number:'',note:''},univ:{qr:'',name:'',number:'',note:''}};const PK='enrollease-payinfo-v2';
+const RK='enrollease-records-pdf',PJ='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js',PW='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+let R={},RV='',pj=null,drawn=0;
+function rNorm(){if(!R||typeof R!=='object')R={};if(R.url){const o=R,n=/fits/i.test(o.name)?'fits':/ncssc/i.test(o.name)?'ncssc':'univ';R={};R[n]=o}}
+function saveR(){try{if(Object.keys(R).length)localStorage.setItem(RK,JSON.stringify(R));else localStorage.removeItem(RK);return true}catch(e){return false}}
+function pickPdf(inp){const f=inp.files[0];if(!f)return;
+ if(!/\.pdf$/i.test(f.name)&&f.type!=='application/pdf')return notify('Please choose a PDF file.');
+ if(f.size>1024*1024)return notify('PDF is too big (max 1 MB). Please compress it first.');
+ const r=new FileReader();r.onload=()=>{const k=S.office||'ncssc';R[k]={name:f.name,size:f.size,url:r.result,date:new Date().toLocaleString()};notify(saveR()?'Student Records PDF uploaded for '+offName(k)+'.':'Uploaded, but too big to keep after closing this page.');render()};r.readAsDataURL(f)}
+function delPdf(){if(confirm('Remove the Student Records PDF of your office?')){delete R[S.office||'ncssc'];saveR();S.modal=null;render()}}
+const pjLoad=()=>pj=pj||new Promise((ok,no)=>{const s=document.createElement('script');s.src=PJ;
+ s.onload=async()=>{try{const t=await(await fetch(PW)).text();pdfjsLib.GlobalWorkerOptions.workerSrc=URL.createObjectURL(new Blob([t],{type:'text/javascript'}))}catch(e){pdfjsLib.GlobalWorkerOptions.workerSrc=PW}ok()};
+ s.onerror=()=>{pj=null;no(new Error('pdf.js failed to load'))};document.head.appendChild(s)});
+function pdfZoom(d){S.pz=Math.min(400,Math.max(100,(S.pz||100)+d));const v=$('#pdfv'),z=$('#pz');if(v)v.style.width=S.pz+'%';if(z)z.textContent=S.pz+'%'}
+function bytes(u){const b=atob(u.split(',')[1]),a=new Uint8Array(b.length);for(let i=0;i<b.length;i++)a[i]=b.charCodeAt(i);return a}
+async function drawPdf(){const box=$('#pdfv');if(!box||!R[RV])return;const id=++drawn,gone=()=>id!==drawn||!box.isConnected;
+ try{await pjLoad();const pdf=await pdfjsLib.getDocument({data:bytes(R[RV].url)}).promise;if(gone())return;box.innerHTML='';
+  for(let n=1;n<=pdf.numPages;n++){const pg=await pdf.getPage(n);if(gone())return;
+   const w0=pg.getViewport({scale:1}).width,tw=Math.min(pdf.numPages>4?2200:3200,Math.max(1800,(box.clientWidth||600)*(window.devicePixelRatio||1)*3)),k=tw/w0,v=pg.getViewport({scale:k}),c=document.createElement('canvas');
+   c.width=v.width;c.height=v.height;c.className='pg';box.appendChild(c);await pg.render({canvasContext:c.getContext('2d'),viewport:v}).promise}
+ }catch(e){if(gone())return;const u=URL.createObjectURL(new Blob([bytes(R[RV].url)],{type:'application/pdf'}));box.innerHTML=`<p class="hint">The viewer needs internet once to load. Showing the browser's own PDF view instead.</p><iframe class="pgf" src="${u}"></iframe>`}}
+function saveUrl(){const u=($('#surl').value||'').trim();if(u&&!/^https:\/\/script\.google\.com\//.test(u))return notify('That does not look like an Apps Script Web App URL.');
+ SHEET_URL=u;try{u?localStorage.setItem(SK,u):localStorage.removeItem(SK)}catch(e){}notify(u?'Google Sheet URL saved.':'Google Sheet URL removed.');render()}
+function oSheet(){return `<div class="welcome"><div><div class="eyebrow">Database</div><h1>Google Sheet</h1><p>Student data and their Pending / Enrolled status.</p></div></div>
+ <div class="panel" style="max-width:560px"><div class="panel-head"><div><h3>Connect your Google Sheet</h3><p>Paste your Apps Script Web App URL. Sending to Google works when this page is opened as a downloaded file or hosted, not in an online preview.</p></div>${SHEET_URL?'<span class="status confirmed">Connected</span>':'<span class="status pending">Not connected</span>'}</div>
+ <div class="field"><label>Apps Script Web App URL</label><input id="surl" value="${esc(SHEET_URL)}" placeholder="https://script.google.com/macros/s/..."></div>
+ <div class="form-actions" style="justify-content:stretch"><button class="btn btn-primary" style="width:100%" onclick="saveUrl()">Save URL</button></div></div>`}
+/* ---- payment info (officer sets, student sees) ---- */
+/* ---- payment methods ---- */
+const METHODS=[{id:'gcash',n:'GCash',lab:'GCash number',ph:'09XXXXXXXXX',re:/^09\d{9}$/,hint:'11 digits, starts with 09',ref:13},{id:'cashlite',n:'LandBank Cash Lite',lab:'Account number',ph:'Account / card number',re:/^\d{10,16}$/,hint:'10 to 16 digits',ref:0},{id:'maribank',n:'Maribank',lab:'Account number',ph:'Account number',re:/^\d{10,16}$/,hint:'10 to 16 digits',ref:0}];
+const mth=id=>METHODS.find(m=>m.id===id)||METHODS[0];
+function pm(k){const P=PO[k];if(!P.m){P.m={};METHODS.forEach(x=>P.m[x.id]={on:false,ok:false,qr:'',name:'',number:''});if(P.qr||P.name||P.number)Object.assign(P.m.gcash,{on:true,ok:true,qr:P.qr,name:P.name,number:P.number})}METHODS.forEach(x=>{if(!P.m[x.id])P.m[x.id]={on:false,ok:false,qr:'',name:'',number:''}});return P.m}
+const onMs=k=>METHODS.filter(m=>pm(k)[m.id].on);
+const pmOf=(k,d)=>{const l=onMs(k);return l.find(m=>m.id===(d&&d.pm))||l[0]||null};
+const refOk=(m,r)=>m.ref?new RegExp('^\\d{'+m.ref+'}$').test(r||''):/^[A-Za-z0-9]{6,24}$/.test(r||'');
+
+function savePay(msg){let ok=true;try{localStorage.setItem(PK,JSON.stringify(PO))}catch(e){ok=false}notify(!ok?'Saved for now, but too big to keep after closing this page.':msg||'Payment details saved.')}
+function pickQr(inp){const k=S.office||'ncssc',id=S.PM||'gcash',f=inp.files[0];if(!f)return;if(!/^image\//.test(f.type))return notify('Please choose an image of the QR code.');
+ const r=new FileReader();r.onload=()=>{const im=new Image();im.onload=()=>{const c=document.createElement('canvas'),q=Math.min(1,700/Math.max(im.width,im.height));c.width=im.width*q;c.height=im.height*q;c.getContext('2d').drawImage(im,0,0,c.width,c.height);pm(k)[id].qr=c.toDataURL('image/png');savePay('QR code uploaded.');render()};im.onerror=()=>notify('Could not read that image.');im.src=r.result};r.readAsDataURL(f)}
+function delQr(){pm(S.office||'ncssc')[S.PM||'gcash'].qr='';savePay('QR code removed.');render()}
+function saveMethod(){const k=S.office||'ncssc',id=S.PM||'gcash',m=mth(id),P=pm(k)[id];P.number=(P.number||'').trim();P.name=(P.name||'').trim();
+ if(P.on){const n=id==='bank'?P.number:P.number.replace(/[\s-]/g,'');let err='';
+  if(!P.name||!m.re.test(n))err='Enter the account holder name and a valid '+m.lab.toLowerCase()+' ('+m.hint+').';else if(!P.ok)err='Please tick the confirmation that this is a secure, official account.';
+  if(err){P.on=false;savePay(err);return render()}}
+ savePay(P.on?m.n+' is now available to students.':m.n+' saved (hidden from students).');render()}
+function payInfo(k,id){const P=pm(k)[id],N=PO[k].note;if(!(P.qr||P.name||P.number))return '<div class="notice" style="margin:12px 0"><span>ⓘ</span><div><b>No payment details yet</b>This office has not added details for this method.</div></div>';
+ return `${P.qr?`<img class="thumb" style="max-height:240px;margin:12px auto" src="${P.qr}" alt="Payment QR code">`:''}<div style="text-align:center;font-size:12px;margin-bottom:8px">${P.name?`<div>Account name: <b>${esc(P.name)}</b></div>`:''}${P.number?`<div>${esc(mth(id).lab)}: <b>${esc(P.number)}</b></div>`:''}<div class="hint">Check that the account name matches before you send.</div></div>${N?`<p style="white-space:pre-wrap;margin:0 0 12px">${esc(N)}</p>`:''}`}
+const fmtD=v=>new Date(v+'T00:00:00').toLocaleDateString('en-PH',{month:'short',day:'numeric',year:'numeric'});
+function schedState(){const c=D.sched||{};if(!c.from||!c.to)return{open:true,set:false,msg:''};
+ if(c.late)return{open:true,set:true,msg:'Enrollment is open (late enrollment allowed).'};
+ const now=new Date(),f=new Date(c.from+'T00:00:00'),t=new Date(c.to+'T23:59:59'),rng=fmtD(c.from)+' to '+fmtD(c.to);
+ if(now<f)return{open:false,set:true,msg:'Enrollment has not started yet. Your college enrolls on '+rng+'.'};
+ if(now>t)return{open:false,set:true,msg:'Enrollment is closed. Your college enrolled on '+rng+'. Please ask the officer for late enrollment.'};
+ return{open:true,set:true,msg:'Enrollment for your college is open on '+rng+'.'}}
+function schedBanner(){const c=schedState();if(!c.set)return '';return `<div class="panel" style="padding:12px 16px;margin-bottom:14px;border-left:4px solid ${c.open?'#16a34a':'#dc2626'}"><strong>${c.open?'Enrollment open':'Enrollment closed'}</strong><div class="hint" style="margin-top:2px">${esc(c.msg)}</div></div>`}
+function schedSave(){const d=Object.assign({},D.sched,S.SC||{});
+ if(!!d.from!==!!d.to){notify('Please set both the opening and closing dates.');return}
+ if(d.from&&d.to&&d.to<d.from){notify('The closing date cannot be before the opening date.');return}
+ D.sched={from:d.from||'',to:d.to||'',late:!!d.late};save();S.SC=null;notify('Enrollment schedule saved.');render()}
+function schedClear(){D.sched={from:'',to:'',late:false};save();S.SC=null;notify('Schedule cleared. Enrollment is always open.');render()}
+function oSched(){const d=Object.assign({},D.sched,S.SC||{}),c=schedState();
+ return `<div class="welcome"><div><div class="eyebrow">Officer</div><h1>Enrollment Schedule</h1><p>Set the days when your college can enroll. Students outside these days cannot send a new enrollment form. Students who already sent one can still pay and be approved.</p></div></div>
+ <div class="panel"><div class="fields"><div class="field"><label>Enrollment opens</label><input type="date" value="${esc(d.from)}" oninput="S.SC=Object.assign(S.SC||{},{from:this.value})"></div>
+ <div class="field"><label>Enrollment closes</label><input type="date" value="${esc(d.to)}" oninput="S.SC=Object.assign(S.SC||{},{to:this.value})"></div></div>
+ <label style="display:flex;gap:8px;align-items:center;margin:14px 0"><input type="checkbox" ${d.late?'checked':''} onchange="S.SC=Object.assign(S.SC||{},{late:this.checked})"> Allow late enrollment (open even if the days have passed)</label>
+ <div class="hint" style="margin-bottom:12px">Now: <b>${c.set?(c.open?'Open':'Closed'):'Always open (no schedule set)'}</b>${c.msg?' · '+esc(c.msg):''}</div>
+ <div style="display:flex;gap:10px;flex-wrap:wrap"><button class="btn btn-primary" onclick="schedSave()">Save schedule</button><button class="btn btn-light" onclick="schedClear()">Clear schedule</button></div></div>`}
+function oPay(){const k=S.office||'ncssc',P=PO[k];return `<div class="welcome"><div><div class="eyebrow">${offName(k)}</div><h1>Payment Info</h1><p>Set the QR code and payment details of your office. Students will see these in their Payment page.</p></div></div>
+ <div class="panel" style="max-width:560px"><div class="field"><label>Current semester / school year</label><input id="term" value="${esc(D.term)}"></div><p class="hint">Receipts are recorded under this semester. Changing it starts a new enrollment for all students. Their old receipts stay saved.</p><div class="form-actions" style="justify-content:flex-start"><button class="btn btn-light" onclick="setTerm()">Save semester</button></div></div>
+ <div class="notice" style="max-width:560px;margin-bottom:14px"><span>🔒</span><div><b>Use secure, official accounts only</b>Use the organization's own account in the treasurer's name, not a personal account. Use a verified/fully-verified account with a PIN and 2-step login. Never share your PIN, OTP or password with anyone. Only the account name, number or QR is shown to students. Move collected money out to the school account often, so little stays in the wallet.</div></div>
+ <div class="panel" style="max-width:560px"><div class="field"><label>Payment methods students can choose (${onMs(k).length} available)</label><select onchange="S.PM=this.value;render()">${METHODS.map(m=>`<option value="${m.id}" ${(S.PM||'gcash')===m.id?'selected':''}>${m.n}${pm(k)[m.id].on?' ✔ (available)':''}</option>`).join('')}</select><p class="hint">Pick a method, fill in its details, then turn it on. Only methods marked ✔ appear to students.</p></div>
+ ${(()=>{const m=mth(S.PM||'gcash'),X=pm(k)[m.id];return `<div class="field"><label>${m.n} QR code (optional)</label><div class="upload-box"><input type="file" accept="image/*" onchange="pickQr(this)"><p>${X.qr?'Choose a new image to replace the QR code.':'Upload a clear picture of the QR code.'}</p>${X.qr?`<img class="thumb" style="max-height:220px" src="${X.qr}" alt="QR code"><button class="btn btn-light" style="margin-top:10px" onclick="delQr()">Remove QR code</button>`:''}</div></div>
+ <div class="fields" style="margin-top:15px"><div class="field"><label>Account holder name</label><input value="${esc(X.name)}" oninput="pm('${k}').${m.id}.name=this.value"></div><div class="field"><label>${m.lab}</label><input value="${esc(X.number)}" placeholder="${m.ph}" oninput="pm('${k}').${m.id}.number=this.value"></div></div>
+ <label style="display:flex;gap:8px;align-items:flex-start;font-size:12px;margin:14px 0"><input type="checkbox" style="width:auto;margin-top:2px" ${X.ok?'checked':''} onchange="pm('${k}').${m.id}.ok=this.checked"><span>I confirm this is a secure, official, verified account under the organization (not a personal account).</span></label>
+ <label style="display:flex;gap:8px;align-items:center;font-size:12px;margin:0 0 14px"><input type="checkbox" style="width:auto" ${X.on?'checked':''} onchange="pm('${k}').${m.id}.on=this.checked"><span><b>Make ${m.n} available to students</b></span></label>`})()}
+ <div class="fields"><div class="field full"><label>Payment instructions (optional, shown with every method)</label><textarea rows="3" oninput="PO.${k}.note=this.value">${esc(P.note)}</textarea></div></div>
+ <div class="form-actions"><button class="btn btn-primary" onclick="saveMethod()">Save payment method</button></div></div>
+ <div class="panel" style="max-width:560px"><div class="field"><label>Save &amp; restore your data</label><p class="hint">Download a backup file of everything you entered (students, accounts, payments). Restore it anytime, for example before a demo, if the page opens empty.</p></div><div class="form-actions" style="justify-content:flex-start"><button class="btn btn-light" onclick="backup()">Download backup</button></div><div class="field" style="margin-top:12px"><label>Restore backup</label><div class="upload-box"><input type="file" accept="application/json,.json" onchange="restoreFile(this)"><p>Choose a backup file you downloaded before.</p></div></div></div></div>`}
+function recBox(k){const F=R[k],t=offName(k);return F?`<button class="filecard" onclick="RV='${k}';S.pz=100;S.modal='pdf';render()"><div class="file-icon">PDF</div><div><strong>${t}</strong><small>${esc(F.name)} · ${Math.max(1,Math.round(F.size/1024))} KB · uploaded ${esc(F.date)}</small></div><span class="go">Open ›</span></button>`:`<p class="hint" style="margin:0;padding:6px 0">${t}: no Student Records PDF uploaded yet.</p>`}
+function sRec(){return `<div class="welcome"><div><div class="eyebrow">Records &amp; Fines</div><h1>Student Records</h1><p>Open the PDF of each office and find your ID Number to see your fees, fines and payments from your previous semester. These are not the payments for this enrollment.</p></div></div>
+ <div class="paper">${OFFICES.map(o=>`<div style="margin-bottom:10px">${recBox(o.k)}</div>`).join('')}</div>`}
+function oRec(){const k=S.office||'ncssc';return `<div class="welcome"><div><div class="eyebrow">Officer</div><h1>Student Records</h1><p>Upload the PDF of student records (fees, fines and payments from the previous semester). Students can only view it, not download it.</p></div></div>
+ <div class="panel" style="max-width:560px"><div class="field"><label>Student Records PDF · ${offName(k)}</label><div class="upload-box"><input type="file" accept="application/pdf,.pdf" onchange="pickPdf(this)"><p>${R[k]?'Choose a new file to replace the current one.':'Choose the PDF file to upload.'} Max 1 MB.</p></div></div>${R[k]?'<div class="form-actions" style="justify-content:flex-start"><button class="btn btn-light" onclick="delPdf()">Remove PDF</button></div>':''}</div>
+ <div class="paper">${recBox(k)}</div>`}
+function offCard(s,o){const k=o.k,a=amt(s,k),p=s.po[k],d=S.DR.po[k],st=poStat(s,k);
+ const head=`<div class="panel-head"><div><h3>${o.n}</h3></div>${a?badge(st):''}</div>`;
+ if(!a)return `<div class="panel" style="max-width:560px">${head}<p class="hint" style="margin:0">No payment needed for this office.</p></div>`;
+ const ls=lines(s,k).map(x=>`<div class="fee-line"><span>${x[0]}</span><strong>${peso(x[1])}</strong></div>`).join('')+`<div class="fee-line fee-total"><span>Amount to pay</span><strong>${peso(a)}</strong></div>`;
+ const body=p.choice==='paid'?`<div class="notice" style="margin-top:14px"><span>ⓘ</span><div><b>Payment details submitted</b>${p.method?esc(p.method)+' · ':''}Reference no. ${esc(p.ref)} · ${p.paid?'Confirmed':'waiting for the office to check'}${p.paid&&rcOf(s,k)?` · <button class="link-btn" onclick="viewRc('${s.id}','${rcOf(s,k).no}')">E-receipt ${rcOf(s,k).no}</button>`:''}</div></div>`
+ :`<div class="payment-method">${(()=>{const L=onMs(k),m=pmOf(k,d);if(!m)return '<h4>Payment method</h4><div class="notice" style="margin:12px 0"><span>ⓘ</span><div><b>No payment method yet</b>This office has not made any payment method available. Please check back later.</div></div>';
+ return `<h4>Choose how to pay</h4><div class="field" style="margin:8px 0"><select onchange="S.DR.po.${k}.pm=this.value;render()">${L.map(x=>`<option value="${x.id}" ${x.id===m.id?'selected':''}>${x.n}</option>`).join('')}</select></div><p>Pay ${esc(o.n)} through ${m.n} using the details below, then type the reference number and upload the receipt you got.</p>${payInfo(k,m.id)}
+ <div class="field"><label>${m.ref?m.ref+'-digit ':''}Reference Number</label><input ${m.ref?'inputmode="numeric" maxlength="13"':'maxlength="24"'} value="${esc(d.ref||'')}" oninput="this.value=this.value.replace(${m.ref?'/\\D/g':'/[^A-Za-z0-9]/g'},'');S.DR.po.${k}.ref=this.value"></div>`})()}
+ <div class="field" style="margin-top:12px"><label>Screenshot(s) of payment receipt</label>${upMany('po.'+k+'.shot','Upload the screenshot after payment.')}</div><div class="err">${S.errK===k?S.err:''}</div>
+ <div class="form-actions" style="justify-content:stretch"><button class="btn btn-primary" style="width:100%" onclick="submitPay('${k}')">Submit Payment Details</button></div></div>`;
+ return `<div class="panel" style="max-width:560px">${head}${ls}${body}</div>`}
+function sPay(){if(!S.id)return need();const s=me(),canLater=reqOf(s).some(o=>!s.po[o.k].choice),anyLater=reqOf(s).some(o=>s.po[o.k].choice==='later');
+ return `<div class="welcome"><div><div class="eyebrow">Fees &amp; receipts</div><h1>Payment</h1><p>Pay each office separately, then upload the receipt from each one. These are the fees for the semester you are enrolling in now. Your previous semester records are in Student Records. Total: <b>${peso(total(s))}</b> &nbsp; ${badge(payStat(s))}</p></div></div>${OFFICES.map(o=>offCard(s,o)).join('')}
+ ${anyLater?'<p class="hint">You chose Pay Later for some offices. Your enrollment is Pending.</p>':''}${canLater?'<button class="btn btn-light" style="width:100%;max-width:560px" onclick="payLater()">Pay Later</button>':''}`}
+function submitPay(k){const s=me(),d=S.DR.po[k];if(rcOf(s,k)){notify('You already paid '+offName(k)+' this semester. See My Receipts.');return render()}S.errK=k;const m=pmOf(k,d);if(!m){S.err='No payment method is available yet.';return render()}if(!refOk(m,d.ref)){S.err=m.ref?'Please type a valid '+m.ref+'-digit reference number.':'Please type a valid reference number (letters and numbers only).';return render()}
+ if(!fl(d.shot).length){S.err='Please upload your payment receipt screenshot.';return render()}S.err='';
+ Object.assign(s.po[k],{ref:d.ref,shot:fl(d.shot),choice:'paid',method:m.n});notif(s,'Payment details for '+offName(k)+' submitted. Status: Pending.');onotif(k,s.id+' · '+s.name+' submitted a payment of '+peso(amt(s,k))+'. Ref no. '+d.ref+' via '+m.n+'. Please check it.',s.id);sync(s);notify(offName(k)+' payment submitted');
+ if(reqOf(s).every(o=>s.po[o.k].choice==='paid'))go('stat');else render()}
+function payLater(){const s=me();reqOf(s).forEach(o=>{if(!s.po[o.k].choice)s.po[o.k].choice='later'});notif(s,'You chose Pay Later. Enrollment status: Pending. Unpaid balance: '+peso(unpaidAmt(s))+'.');sync(s);notify('Pending enrollment submitted');go('stat')}
+function sStat(){if(!S.id)return need();const s=me(),ps=allPaid(s),detail=reqOf(s).map(o=>o.n+': '+poStat(s,o.k)).join(' · '),a=[['Student Information','Profile and documents submitted.',true],['Payment Verification',detail,ps],['Faculty Adviser Approval',advOk(s)?'Approved by your Faculty Adviser.'+(s.adv&&s.adv.by?' ('+esc(s.adv.by)+')':''):ps?'Waiting for your Faculty Adviser to approve.':'Starts after all offices confirm your payment.',advOk(s)],['Officially Enrolled','Check your SIAS account to see if you are officially enrolled and to view your subjects.',s.enr==='Enrolled']],cur=a.findIndex(x=>!x[2]);
+ return `<div class="welcome"><div><div class="eyebrow">Tracking</div><h1>Enrollment Status</h1><p>Payment: ${badge(payStat(s))} &nbsp; Enrollment: ${badge(s.enr)}</p></div><button class="btn btn-light" onclick="render();notify('Status refreshed')">Refresh</button></div>
+ <div class="panel" style="max-width:560px"><div class="timeline">${a.map((x,i)=>`<div class="timeline-item ${x[2]||i===cur?'current':''}"><div class="timeline-dot"></div><div><strong>${x[0]} ${x[2]?'✔':''}</strong><small>${x[1]}</small></div></div>`).join('')}</div></div>`}
+/* ---- officer ---- */
+function oList(){const k=S.office||'ncssc',a=subs().filter(x=>amt(x,k)>0),T=['All','Unpaid','Pending','Confirmed'],f=a.filter(x=>S.tab==='All'||poStat(x,k)===S.tab);
+ return `<div class="welcome"><div><div class="eyebrow">${offName(k)}</div><h1>Student List</h1><p>Check which students paid your office, review reference numbers and receipts, then confirm their payment.</p></div></div>
+ <div class="tabs">${T.map(t=>`<button class="btn ${S.tab===t?'btn-primary':'btn-light'}" onclick="S.tab='${t}';render()">${t} (${t==='All'?a.length:a.filter(x=>poStat(x,k)===t).length})</button>`).join('')}</div>
+ <div class="panel tw"><table class="tbl"><tr><th>ID Number</th><th>Name</th><th>Course</th><th>Section</th><th>Amount</th><th>Payment</th><th>Enrollment</th><th></th></tr>${f.length?f.map(x=>`<tr><td>${x.id}</td><td>${esc(x.name)}</td><td>${esc(x.course)}</td><td>${esc(x.section)}</td><td>${peso(amt(x,k))}</td><td>${badge(poStat(x,k))}</td><td>${badge(x.enr)}</td><td><button class="btn btn-light" onclick="S.modal='${x.id}';render()">Review</button></td></tr>`).join(''):'<tr><td colspan="8" class="hint">No students yet. Submissions from the student portal appear here.</td></tr>'}</table></div>`}
+function modal(){if(S.modal==='pdf'){const F=R[RV];if(!F)return '';return `<div class="mod pdfm"><div class="box"><div class="pdfh"><div><strong>${offName(RV)}</strong><div class="hint">${esc(F.name)} · View only</div></div><div class="pdfz"><button class="btn btn-light" onclick="pdfZoom(-50)">−</button><span id="pz">${S.pz||100}%</span><button class="btn btn-light" onclick="pdfZoom(50)">+</button>${closeB}</div></div><div class="pdfs"><div id="pdfv" class="pdfv" style="width:${S.pz||100}%" oncontextmenu="return false"><p class="hint" style="padding:12px;margin:0">Loading PDF…</p></div></div></div></div>`}
+if(S.modal==='onf'){const l=D.on[S.role==='adviser'?'adv':(S.office||'ncssc')]||[],items=l.map(n=>{const sid=n.sid||String(n.m).split(' · ')[0],ok=!!D.st[sid],st=(n.r?'':'font-weight:700;')+(ok?'cursor:pointer;':'');return `<div class="nf"${st?` style="${st}"`:''}${ok?` onclick="S.modal='${sid}';render()"`:''}>${esc(n.m)}<small>${n.t}${ok?' · Tap to review':''}</small></div>`}).join('');l.forEach(n=>{n.r=true});save();return box(`<h3>Notifications</h3>${items||'<p class="hint">No notifications yet.</p>'}<div class="form-actions">${closeB}</div>`)}
+if(S.modal==='nf'){const s=me();s.unread=0;save();return box(`<h3>Notifications</h3>${s.notifs.map(n=>`<div class="nf">${esc(n.m)}<small>${n.t}</small></div>`).join('')||'<p class="hint">No notifications yet.</p>'}<div class="form-actions">${closeB}</div>`)}
+ if(S.modal==='rc')return rcModal();const x=D.st[S.modal];if(!x)return '';if(S.role==='adviser')return advModal(x);
+ const k=S.office||'ncssc',p=x.po[k],a=amt(x,k);
+ const hp=!!p.ref&&fl(p.shot).length>0,K=(ok,t)=>`<div class="chk"><i class="${ok?'ok':'no'}">${ok?'✔':'✖'}</i>${t}</div>`;
+ return box(`<h3>${esc(x.name)} ${badge(x.enr)}</h3><div class="hint" style="margin-bottom:8px">${x.id} · ${esc(x.course)} · ${esc(x.section)}</div>
+ ${K(fl(x.clr).length>0,'Old clearance uploaded'+(fl(x.clr).length>1?' ('+fl(x.clr).length+')':''))}${K(rcl(x).length>0||(x.rc||[]).length>0,(x.rc||[]).length?'Past receipts on file in the system':'Past semester receipt'+(rcl(x).length>1?'s':'')+' uploaded ('+rcl(x).length+')')}${K(hp,'Reference number &amp; receipt screenshot'+(p.ref?': '+p.ref+(p.method?' ('+esc(p.method)+')':''):''))}${hist(x)}
+ <p style="font-size:12px;margin-bottom:4px">${offName(k)} amount: <b>${peso(a)}</b> · Payment: ${badge(poStat(x,k))}</p>
+ ${lines(x,k).map(l=>`<div class="fee-line" style="padding:3px 0"><span>${l[0]}</span><strong>${peso(l[1])}</strong></div>`).join('')}
+ ${pics(x.clr,'Old clearance')}${pics(x.rcp,'Past semester receipt')}${pics(p.shot,'Payment receipt')}
+
+ <div class="form-actions" style="justify-content:flex-start">${!p.paid&&hp?`<button class="btn btn-primary" onclick="approve('${x.id}')">PAID / APPROVED</button>`:''}${x.enr!=='Enrolled'&&!x.listed?`<button class="btn btn-light" onclick="enrollName('${x.id}')">Enroll name (stays Pending)</button>`:''}${closeB}</div>`)}
+const box=i=>`<div class="mod" onclick="if(event.target===this){S.modal=null;render()}"><div class="box">${i}</div></div>`,closeB='<button class="btn btn-light" onclick="S.modal=null;render()">Close</button>';
+function oLog(){const k=S.office||'ncssc',a=subs().filter(x=>x.po[k].paid),sum=a.reduce((t,x)=>t+amt(x,k),0);
+ return `<div class="welcome"><div><div class="eyebrow">${offName(k)}</div><h1>Payment Records</h1><p>Confirmed payments of your office. Total collected: <b>${peso(sum)}</b> from ${a.length} student${a.length===1?'':'s'}.</p></div></div>
+ <div class="panel tw"><table class="tbl"><tr><th>ID Number</th><th>Name</th><th>Course</th><th>Section</th><th>Amount</th><th>Ref No.</th><th>Receipt No.</th><th>Confirmed on</th></tr>${a.length?a.map(x=>`<tr><td>${x.id}</td><td>${esc(x.name)}</td><td>${esc(x.course)}</td><td>${esc(x.section)}</td><td>${peso(amt(x,k))}</td><td>${esc(x.po[k].ref)}</td><td>${rcOf(x,k)?`<button class="link-btn" onclick="viewRc('${x.id}','${rcOf(x,k).no}')">${rcOf(x,k).no}</button>`:''}</td><td>${esc(x.po[k].date||'')}</td></tr>`).join(''):'<tr><td colspan="8" class="hint">No confirmed payments yet.</td></tr>'}</table></div>`}
+function approve(id){const x=D.st[id],k=S.office||'ncssc',p=x.po[k];p.paid=true;p.choice='paid';p.date=new Date().toLocaleString();const rc=mkReceipt(x,k);notif(x,'Payment to '+offName(k)+' confirmed. Your e-receipt '+rc.no+' is saved in My Receipts.');let msg;
+  if(allPaid(x)){x.paid=true;notif(x,'All payments confirmed. Waiting for your Faculty Adviser to approve your enrollment.');onotif('adv',x.id+' · '+x.name+' ('+x.course+' '+x.section+') has paid all offices. Waiting for your approval.',x.id);msg=x.name+' is fully paid. Sent to the Faculty Adviser for approval'}
+  else msg='Confirmed. '+x.name+' still has other offices to pay.';
+  sync(x);S.modal=null;notify(msg);render()}
+function enrollName(id){const x=D.st[id];x.listed=true;x.enr='Pending';notif(x,'Your name was enrolled by the officer, but your status is PENDING until you pay '+peso(unpaidAmt(x))+'.');sync(x);S.modal=null;notify('Saved as Pending. Student notified.');render()}
+/* ---- adviser ---- */
+function aList(){const a=subs().filter(mineAdv),T=['Awaiting','Approved','Not yet paid','All'],f=a.filter(x=>S.tab==='All'||aStat(x)===S.tab);
+ return `<div class="welcome"><div><div class="eyebrow">Faculty Adviser</div><h1>Student List</h1><p>Students who paid all offices are ready for your approval. Review their documents, then approve their enrollment.${S.courses&&S.courses.length?' Showing: <b>'+esc(S.courses.join(', '))+'</b>':''}</p></div></div>
+ <div class="tabs">${T.map(t=>`<button class="btn ${S.tab===t?'btn-primary':'btn-light'}" onclick="S.tab='${t}';render()">${t} (${t==='All'?a.length:a.filter(x=>aStat(x)===t).length})</button>`).join('')}</div>
+ <div class="panel tw"><table class="tbl"><tr><th>ID Number</th><th>Name</th><th>Course</th><th>Section</th><th>Payments</th><th>Adviser Approval</th><th></th></tr>${f.length?f.map(x=>`<tr><td>${x.id}</td><td>${esc(x.name)}</td><td>${esc(x.course)}</td><td>${esc(x.section)}</td><td>${paidCount(x)}</td><td>${abadge(x)}</td><td><button class="btn btn-light" onclick="S.modal='${x.id}';render()">Review</button></td></tr>`).join(''):'<tr><td colspan="7" class="hint">No students here yet. Students appear when all their offices confirm payment.</td></tr>'}</table></div>`}
+function aLog(){const a=subs().filter(x=>mineAdv(x)&&advOk(x));
+ return `<div class="welcome"><div><div class="eyebrow">Faculty Adviser</div><h1>Approved Students</h1><p>${a.length} student${a.length===1?'':'s'} approved and enrolled.</p></div></div>
+ <div class="panel tw"><table class="tbl"><tr><th>ID Number</th><th>Name</th><th>Course</th><th>Section</th><th>Approved by</th><th>Approved on</th></tr>${a.length?a.map(x=>`<tr><td>${x.id}</td><td>${esc(x.name)}</td><td>${esc(x.course)}</td><td>${esc(x.section)}</td><td>${esc((x.adv&&x.adv.by)||'')}</td><td>${esc((x.adv&&x.adv.date)||'')}</td></tr>`).join(''):'<tr><td colspan="6" class="hint">No approved students yet.</td></tr>'}</table></div>`}
+function advModal(x){const K=(ok,t)=>`<div class="chk"><i class="${ok?'ok':'no'}">${ok?'✔':'✖'}</i>${t}</div>`;
+ const offs=OFFICES.map(o=>amt(x,o.k)?K(x.po[o.k].paid,o.n+': '+poStat(x,o.k)+' · '+peso(amt(x,o.k))+(x.po[o.k].ref?' · Ref '+esc(x.po[o.k].ref):'')):'').join('');
+ return box(`<h3>${esc(x.name)} ${abadge(x)}</h3><div class="hint" style="margin-bottom:8px">${x.id} · ${esc(x.course)} · ${esc(x.section)}</div>
+ ${offs}${hist(x)}${K(fl(x.clr).length>0,'Old clearance uploaded'+(fl(x.clr).length>1?' ('+fl(x.clr).length+')':''))}${K(rcl(x).length>0||(x.rc||[]).length>0,(x.rc||[]).length?'Past receipts on file in the system':'Past semester receipt'+(rcl(x).length>1?'s':'')+' uploaded ('+rcl(x).length+')')}
+ ${pics(x.clr,'Old clearance')}${pics(x.rcp,'Past semester receipt')}
+ ${advOk(x)&&x.adv&&x.adv.by?`<p class="hint">Approved by ${esc(x.adv.by)} on ${esc(x.adv.date)}</p>`:''}
+ ${!allPaid(x)?'<p class="hint">You can approve once all offices have confirmed this student\'s payment.</p>':''}
+ <div class="form-actions" style="justify-content:flex-start">${allPaid(x)&&!advOk(x)?`<button class="btn btn-primary" onclick="advApprove('${x.id}')">APPROVE ENROLLMENT</button>`:''}${closeB}</div>`)}
+function advApprove(id){const x=D.st[id];if(!x||!allPaid(x)||advOk(x))return;x.adv={ok:true,by:S.uid||'Faculty Adviser',date:new Date().toLocaleString()};x.enr='Enrolled';notif(x,'Congratulations! Your Faculty Adviser approved your enrollment. You are now ENROLLED for '+D.term+'.');
+ sync(x);S.modal=null;notify(x.name+' is now Enrolled');render()}
+document.addEventListener('click',e=>{const t=e.target;if(t&&t.tagName==='IMG'&&t.classList.contains('thumb')&&t.src)openPv(t.src)});
+load();render();
+</script>
+</body>
+</html>
